@@ -7,7 +7,8 @@ use anyhow::Result;
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Row, SqlitePool};
-use tokio::sync::{Mutex, RwLock};
+use tokio::sync::RwLock;
+use tracing::info;
 
 /// Represents a book, taken from the books table in SQLite.
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
@@ -57,6 +58,7 @@ pub async fn init_db() -> Result<SqlitePool> {
     let database_url = std::env::var("DATABASE_URL")?;
     let connection_pool = SqlitePool::connect(&database_url).await?;
     sqlx::migrate!().run(&connection_pool).await?;
+    info!("connect to {:?} successfully!", &database_url);
     Ok(connection_pool)
 }
 
